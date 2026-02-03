@@ -2,13 +2,15 @@
 
 Auto screenshot tool for documentation. Captures screenshots from a list of URLs using Playwright.
 
-### Why "Parker"?
+### Why "Parker"? 🕷️
 
-You know Peter Parker — the guy who swings around New York with his *web shooter*, capturing whatever he needs. That's what this tool does: it captures the **web**.
+You know Peter Parker — the guy who swings around New York with his *web shooter* 🕸️, capturing whatever he needs. That's what this tool does: it captures the **web** 🌐.
 
-But Peter Parker is also a photographer. He doesn't just swing around; he takes photos — sharp, well-timed shots that tell a story. That's exactly what Parker (this tool) does: it takes **screenshots** of your app, one page at a time.
+But Peter Parker is also a photographer 📸. He doesn't just swing around; he takes photos — sharp, well-timed shots that tell a story. That's exactly what Parker (this tool) does: it takes **screenshots** of your app, one page at a time.
 
-And then there's the Parker pen — a classic tool for **writing**. Because at the end of the day, those screenshots aren't just images. They're the foundation for your documentation.
+And then there's the Parker pen 🖊️ — a classic tool for **writing**. Because at the end of the day, those screenshots aren't just images. They're the foundation for your documentation 📝.
+
+*Web shooter. Photographer. Pen. Parker.* ✨
 
 **Key Features:**
 - YAML-based configuration
