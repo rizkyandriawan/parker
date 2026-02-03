@@ -1,25 +1,27 @@
-# Parker
+# Parker 🕷️
 
-Auto screenshot tool for documentation. Captures screenshots from a list of URLs using Playwright.
+**Parker captures your app's UI as documentation artifacts — not test outputs.**
 
-### Why "Parker"? 🕷️
+It shoots the web, takes screenshots, and turns them into something you can write with.
 
-You know Peter Parker — the guy who swings around New York with his *web shooter* 🕸️, capturing whatever he needs. That's what this tool does: it captures the **web** 🌐.
+> *Named after Peter Parker's web shooter 🕸️, his camera 📸, and the Parker pen 🖊️.*
+> *Web. Screenshots. Documentation.*
 
-But Peter Parker is also a photographer 📸. He doesn't just swing around; he takes photos — sharp, well-timed shots that tell a story. That's exactly what Parker (this tool) does: it takes **screenshots** of your app, one page at a time.
+---
 
-And then there's the Parker pen 🖊️ — a classic tool for **writing**. Because at the end of the day, those screenshots aren't just images. They're the foundation for your documentation 📝.
+**Parker is not a testing framework.** It's a documentation tool that happens to use screenshots.
 
-*Web shooter. Photographer. Pen. Parker.* ✨
+## What It Does
 
-**Key Features:**
-- YAML-based configuration
-- Authentication support (login flows)
-- Multi-device capture (desktop, tablet, mobile)
-- Wait for elements (for SPAs/dynamic content)
-- HTML gallery output
-- Manifest with rich metadata for LLM-powered doc generation
-- CI-friendly exit codes
+- 📸 Capture screenshots from a list of URLs
+- 🔐 Handle authentication (login flows)
+- 📱 Multi-device capture (desktop, tablet, mobile)
+- ⏳ Wait for dynamic content (SPAs)
+
+**Advanced:**
+- 📄 Generate manifest.json (LLM-friendly metadata)
+- 🖼️ Generate HTML gallery
+- 🚦 CI-friendly exit codes
 
 ## Installation
 
@@ -34,7 +36,7 @@ playwright install chromium
 
 ## Quick Start
 
-1. Create a config file `urls.yaml`:
+1. Create `urls.yaml`:
 
 ```yaml
 urls:
@@ -45,7 +47,7 @@ urls:
     description: "Main dashboard page"
 ```
 
-2. Run Parker:
+2. Run:
 
 ```bash
 python parker.py -c urls.yaml
@@ -53,50 +55,41 @@ python parker.py -c urls.yaml
 
 3. Screenshots saved to `./screenshots/`
 
+> ⚠️ **For SPAs or authenticated pages**, use `wait_for` or `auth`. See [Configuration](#configuration).
+
 ## Usage
 
 ```bash
 python parker.py -c <config.yaml> [options]
 ```
 
-### Options
-
 | Flag | Description | Default |
 |------|-------------|---------|
-| `-c, --config` | YAML config file (required) | - |
+| `-c, --config` | YAML config file | (required) |
 | `-o, --output` | Output directory | `./screenshots` |
-| `--viewport` | Viewport size (WIDTHxHEIGHT) | `1280x720` |
-| `--wait` | Extra wait time in ms | `0` |
+| `--viewport` | Viewport size | `1280x720` |
+| `--wait` | Extra wait time (ms) | `0` |
 | `--wait-for` | Wait for CSS selector | - |
-| `--full-page` | Capture full scrollable page | `false` |
+| `--full-page` | Full page screenshot | `false` |
 | `--manifest` | Generate manifest.json | `false` |
 | `--html` | Generate HTML gallery | `false` |
-
-### Examples
 
 ```bash
 # Basic
 python parker.py -c urls.yaml
 
-# Custom output directory
-python parker.py -c urls.yaml -o ./docs/images
+# SPA with element wait
+python parker.py -c urls.yaml --wait-for "#app"
 
-# Wait for element before capture (useful for SPAs)
-python parker.py -c urls.yaml --wait-for "#app-loaded"
-
-# Full page with HTML gallery
-python parker.py -c urls.yaml --full-page --html
-
-# CI mode with manifest
-python parker.py -c urls.yaml --manifest
-echo "Exit code: $?"
+# Full output
+python parker.py -c urls.yaml --full-page --html --manifest
 ```
 
 ## Configuration
 
-See **[CONFIG.md](CONFIG.md)** for full configuration reference.
+See **[CONFIG.md](CONFIG.md)** for full reference.
 
-### Basic Config
+### Basic
 
 ```yaml
 urls:
@@ -110,7 +103,7 @@ urls:
 urls:
   - url: http://localhost:3000/dashboard
     name: dashboard
-    description: "Analytics dashboard with charts"
+    description: "Analytics dashboard"
     wait_for: "#charts-loaded"
 ```
 
@@ -130,10 +123,10 @@ auth:
 urls:
   - http://localhost:3000           # public
   - url: http://localhost:3000/dashboard
-    auth: true                       # requires login
+    auth: true                       # needs login
 ```
 
-### Multi-Device Capture
+### Multi-Device
 
 ```yaml
 urls:
@@ -163,28 +156,25 @@ urls:
 
 ### Screenshots
 
-Auto-named from URL path:
+Auto-named from URL:
 
 ```
 http://localhost:3000/dashboard → localhost-3000-dashboard.png
-http://localhost:3000/users     → localhost-3000-users.png
 ```
 
 ### Manifest (`--manifest`)
 
-JSON file with rich metadata:
+JSON with metadata — designed to be easy to feed into documentation workflows:
 
 ```json
 {
   "generated_at": "2024-01-15T10:30:00",
-  "viewport": "1280x720",
   "screenshots": [
     {
       "url": "http://localhost:3000/dashboard",
       "filename": "dashboard.png",
-      "status": "ok",
       "title": "Dashboard - MyApp",
-      "page_description": "View your analytics and metrics",
+      "page_description": "View your analytics",
       "hash": "a1b2c3d4e5f6",
       "description": "Main dashboard"
     }
@@ -192,67 +182,43 @@ JSON file with rich metadata:
 }
 ```
 
-**Manifest fields for LLM context:**
-- `title` - Page title from `<title>` tag
-- `page_description` - Auto-extracted from meta description or first paragraph
-- `description` - Custom description from config
-- `hash` - For diff detection in CI
-
 ### HTML Gallery (`--html`)
 
-Interactive gallery with:
-- Thumbnail grid
-- Click to view fullscreen
-- Auth/device badges
-- Success/failure summary
+Interactive gallery: thumbnails, fullscreen view, auth/device badges.
 
 ## Exit Codes
 
-| Code | Meaning | CI Action |
-|------|---------|-----------|
-| `0` | All screenshots captured | Pass |
-| `1` | Partial success (some failed) | Warning |
-| `2` | Critical error | Fail |
+| Code | Meaning |
+|------|---------|
+| `0` | All captured |
+| `1` | Partial (some failed) |
+| `2` | Critical error |
 
 ## Use Cases
 
-### Documentation Generation
+### 📝 Documentation Generation (Primary)
+
+This is what Parker is built for:
 
 ```bash
-# Capture screenshots
 python parker.py -c docs-urls.yaml --manifest --html
 
-# Feed to LLM for doc generation
-# manifest.json contains: URLs, titles, descriptions, screenshots
+# manifest.json + screenshots → feed to LLM or doc generator
 ```
 
-### Visual Regression Testing
+### Secondary: Visual Regression
 
 ```bash
-# Capture baseline
 python parker.py -c urls.yaml -o ./baseline --manifest
-
-# Capture current
 python parker.py -c urls.yaml -o ./current --manifest
-
-# Compare hashes in manifest.json
+# Compare hashes
 ```
 
-### CI/CD Integration
+### Secondary: CI/CD
 
 ```bash
-#!/bin/bash
 python parker.py -c urls.yaml --manifest
-exit_code=$?
-
-if [ $exit_code -eq 0 ]; then
-  echo "All screenshots captured"
-elif [ $exit_code -eq 1 ]; then
-  echo "Warning: Some screenshots failed"
-else
-  echo "Error: Critical failure"
-  exit 1
-fi
+if [ $? -eq 2 ]; then exit 1; fi
 ```
 
 ## License
