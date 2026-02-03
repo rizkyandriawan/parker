@@ -4,6 +4,33 @@
 # 1. String langsung: "http://localhost:3000/dashboard"
 # 2. Object dengan metadata: { url: "...", name: "custom-name", description: "..." }
 # 3. Object dengan POST data: { url: "...", method: "POST", data: {...} }
+# 4. Object dengan auth: { url: "...", auth: true }
+
+# Authentication config (optional)
+# Define auth steps if any URL requires authentication
+auth:
+  url: http://localhost:3000/login
+  steps:
+    # Fill form fields
+    - fill: "#email"
+      value: "admin@example.com"
+    - fill: "#password"
+      value: "password123"
+
+    # Click submit button
+    - click: "button[type=submit]"
+
+    # Wait for redirect/page load
+    - wait: 2000
+
+    # Or wait for specific element
+    # - wait_for: ".dashboard-header"
+
+    # Other available steps:
+    # - type: "#search"          # Type with key events (for autocomplete etc)
+    #   value: "search term"
+    # - press: "Enter"           # Press keyboard key
+    # - goto: "http://..."       # Navigate to URL
 
 urls:
   # Simple string format - filename auto dari URL
@@ -38,3 +65,19 @@ urls:
     headers:
       X-Admin-Token: "dev-token"
     name: admin-report
+
+  # URLs that require authentication (will use auth config above)
+  - url: http://localhost:3000/dashboard
+    auth: true
+    name: dashboard
+    description: "Main dashboard (requires login)"
+
+  - url: http://localhost:3000/settings/profile
+    auth: true
+    name: settings-profile
+    description: "User profile settings"
+
+  - url: http://localhost:3000/admin/users
+    auth: true
+    name: admin-users
+    description: "Admin user management page"

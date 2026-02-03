@@ -45,14 +45,81 @@ def load_config(config_path: str) -> dict:
         return yaml.safe_load(f)
 
 
+def perform_auth(page, auth_config: dict) -> bool:
+    """Perform authentication steps."""
+    auth_url = auth_config.get("url")
+    steps = auth_config.get("steps", [])
+
+    if not auth_url:
+        print("  Error: auth.url is required")
+        return False
+
+    print(f"  Navigating to {auth_url}")
+    page.goto(auth_url, wait_until="networkidle")
+
+    for step in steps:
+        try:
+            if "fill" in step:
+                selector = step["fill"]
+                value = step.get("value", "")
+                print(f"    Fill: {selector}")
+                page.fill(selector, value)
+
+            elif "click" in step:
+                selector = step["click"]
+                print(f"    Click: {selector}")
+                page.click(selector)
+
+            elif "wait" in step:
+                ms = step["wait"]
+                print(f"    Wait: {ms}ms")
+                page.wait_for_timeout(ms)
+
+            elif "wait_for" in step:
+                selector = step["wait_for"]
+                print(f"    Wait for: {selector}")
+                page.wait_for_selector(selector)
+
+            elif "type" in step:
+                selector = step["type"]
+                value = step.get("value", "")
+                print(f"    Type: {selector}")
+                page.type(selector, value)
+
+            elif "press" in step:
+                key = step["press"]
+                print(f"    Press: {key}")
+                page.keyboard.press(key)
+
+            elif "goto" in step:
+                url = step["goto"]
+                print(f"    Goto: {url}")
+                page.goto(url, wait_until="networkidle")
+
+        except Exception as e:
+            print(f"    Error in auth step: {e}")
+            return False
+
+    print("  Auth completed")
+    return True
+
+
 def capture_screenshots(config: dict, output_dir: Path, viewport: tuple, wait: int, full_page: bool):
     """Capture screenshots for all URLs in config."""
     urls = config.get("urls", [])
+    auth_config = config.get("auth")
+
     if not urls:
         print("Error: No URLs found in config")
         sys.exit(1)
 
     output_dir.mkdir(parents=True, exist_ok=True)
+
+    # Check if any URL needs auth
+    needs_auth = any(
+        (isinstance(entry, dict) and entry.get("auth"))
+        for entry in urls
+    )
 
     with sync_playwright() as p:
         browser = p.chromium.launch()
@@ -60,6 +127,19 @@ def capture_screenshots(config: dict, output_dir: Path, viewport: tuple, wait: i
             viewport={"width": viewport[0], "height": viewport[1]}
         )
         page = context.new_page()
+
+        # Perform auth if needed
+        auth_done = False
+        if needs_auth:
+            if not auth_config:
+                print("Error: URLs require auth but no 'auth' config defined")
+                sys.exit(1)
+            print("Authenticating...")
+            auth_done = perform_auth(page, auth_config)
+            if not auth_done:
+                print("Error: Authentication failed")
+                sys.exit(1)
+            print()
 
         results = []
 
@@ -72,6 +152,7 @@ def capture_screenshots(config: dict, output_dir: Path, viewport: tuple, wait: i
                 method = "GET"
                 post_data = None
                 headers = None
+                requires_auth = False
             else:
                 url = entry.get("url")
                 name = entry.get("name")
@@ -79,6 +160,7 @@ def capture_screenshots(config: dict, output_dir: Path, viewport: tuple, wait: i
                 method = entry.get("method", "GET").upper()
                 post_data = entry.get("data")  # POST body
                 headers = entry.get("headers")
+                requires_auth = entry.get("auth", False)
 
             if not url:
                 print(f"  [{i}/{len(urls)}] Skipping invalid entry")
@@ -88,7 +170,8 @@ def capture_screenshots(config: dict, output_dir: Path, viewport: tuple, wait: i
             filepath = output_dir / f"{filename}.png"
 
             method_str = f" [{method}]" if method != "GET" else ""
-            print(f"  [{i}/{len(urls)}] {url}{method_str}")
+            auth_str = " [AUTH]" if requires_auth else ""
+            print(f"  [{i}/{len(urls)}] {url}{method_str}{auth_str}")
             print(f"          -> {filepath}")
 
             try:
@@ -112,7 +195,8 @@ def capture_screenshots(config: dict, output_dir: Path, viewport: tuple, wait: i
                     "url": url,
                     "file": str(filepath),
                     "filename": f"{filename}.png",
-                    "status": "ok"
+                    "status": "ok",
+                    "auth": requires_auth
                 }
                 if description:
                     result["description"] = description
