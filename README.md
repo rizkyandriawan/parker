@@ -2,6 +2,11 @@
 
 Auto screenshot tool for documentation. Captures screenshots from a list of URLs using Playwright.
 
+> **Why "Parker"?**
+> 1. **Web Shooter** — Peter Parker's weapon captures webs; this tool captures the *web*
+> 2. **Photographer** — Peter Parker shoots photos for Daily Bugle; this tool shoots screenshots
+> 3. **Pen** — Parker is a pen brand; this tool helps you *write* documentation
+
 **Key Features:**
 - YAML-based configuration
 - Authentication support (login flows)
