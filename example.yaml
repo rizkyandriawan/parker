@@ -81,3 +81,34 @@ urls:
     auth: true
     name: admin-users
     description: "Admin user management page"
+
+  # Wait for specific element before screenshot (for SPA/dynamic content)
+  - url: http://localhost:3000/analytics
+    wait_for: "#chart-container"
+    name: analytics
+    description: "Analytics dashboard with charts"
+
+  # Extra wait time (ms) after page load
+  - url: http://localhost:3000/slow-page
+    wait: 3000
+    name: slow-page
+
+  # Multiple device captures (desktop, laptop, tablet, mobile)
+  - url: http://localhost:3000/landing
+    name: landing
+    description: "Landing page - responsive design"
+    devices:
+      - desktop
+      - mobile
+
+  # Combine all features
+  - url: http://localhost:3000/checkout
+    auth: true
+    wait_for: ".checkout-form"
+    wait: 1000
+    name: checkout
+    description: "Checkout page with payment form"
+    devices:
+      - desktop
+      - tablet
+      - mobile
