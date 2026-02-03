@@ -1,0 +1,40 @@
+# Parker - Screenshot Config Example
+#
+# Format URL bisa:
+# 1. String langsung: "http://localhost:3000/dashboard"
+# 2. Object dengan metadata: { url: "...", name: "custom-name", description: "..." }
+# 3. Object dengan POST data: { url: "...", method: "POST", data: {...} }
+
+urls:
+  # Simple string format - filename auto dari URL
+  - http://localhost:3000
+  - http://localhost:3000/login
+  - http://localhost:3000/dashboard
+  - http://localhost:3000/settings/profile
+
+  # Object format - custom filename + description (for manifest)
+  - url: http://localhost:3000/users?tab=active
+    name: users-active-tab
+    description: "User list filtered by active status"
+
+  - url: http://localhost:3000/reports/monthly
+    name: monthly-report
+    description: "Monthly sales report page"
+
+  # POST request - useful for pages that require form submission
+  - url: http://localhost:3000/api/preview
+    method: POST
+    data:
+      template: "invoice"
+      customer_id: 123
+    name: invoice-preview
+    description: "Invoice preview generated via POST"
+
+  # POST with custom headers
+  - url: http://localhost:3000/admin/report
+    method: POST
+    data:
+      report_type: "summary"
+    headers:
+      X-Admin-Token: "dev-token"
+    name: admin-report

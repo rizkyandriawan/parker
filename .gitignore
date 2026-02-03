@@ -1,0 +1,16 @@
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Output folders
+screenshots/
+test-screenshots/
+
+# IDE
+.vscode/
+.idea/
+
+# Local config (user's actual URLs)
+urls.yaml
